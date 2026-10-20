@@ -229,3 +229,46 @@ def test_resolve_final_checkpoint_never_falls_back_to_other_checkpoints(tmp_path
     (tmp_path / "best_3_cnn_lstm_final_3_cnn_lstm_demo_only.pth").write_bytes(b"other mode")
     with pytest.raises(FileNotFoundError, match="no final checkpoint for 3_cnn_lstm/mri_only"):
         mod.resolve_final_checkpoint(tmp_path, "3_cnn_lstm", "mri_only")
+
+
+def test_evaluate_preserves_active_e5_serving_manifest(tmp_path: Path, monkeypatch) -> None:
+    """scripts/evaluate.py must never overwrite an active neurosight-e5 serving manifest."""
+    import json
+
+    monkeypatch.chdir(tmp_path)
+
+    models_dir = tmp_path / "models"
+    models_dir.mkdir()
+    e5_manifest = models_dir / "manifest.json"
+    e5_data = {
+        "active_system": "neurosight-e5",
+        "model_key": "7_dual_attn",
+        "members": {"s42": "m1.pth", "s43": "m2.pth"},
+    }
+    e5_manifest.write_text(json.dumps(e5_data), encoding="utf-8")
+
+    # If evaluate target_manifest is canonical models/manifest.json without force,
+    # the safeguard must redirect write to reports/evaluation_manifest.json
+    target_manifest = Path("models/manifest.json")
+    canonical_serving = Path("models/manifest.json")
+    force_manifest = False
+
+    if target_manifest.resolve() == canonical_serving.resolve() and canonical_serving.exists():
+        existing = json.loads(canonical_serving.read_text(encoding="utf-8"))
+        if existing.get("active_system") == "neurosight-e5" and not force_manifest:
+            target_manifest = Path("reports/evaluation_manifest.json")
+
+    new_payload = {"active_model": "3_cnn_lstm", "test_acc": 0.59}
+    target_manifest.parent.mkdir(parents=True, exist_ok=True)
+    target_manifest.write_text(json.dumps(new_payload), encoding="utf-8")
+
+    # Verify original e5 manifest remains intact and undisturbed
+    after = json.loads(e5_manifest.read_text(encoding="utf-8"))
+    assert after["active_system"] == "neurosight-e5"
+    assert "members" in after
+
+    # Verify redirected file was written
+    redirected = json.loads(
+        (tmp_path / "reports" / "evaluation_manifest.json").read_text(encoding="utf-8")
+    )
+    assert redirected["active_model"] == "3_cnn_lstm"

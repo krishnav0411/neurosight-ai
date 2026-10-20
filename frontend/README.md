@@ -1,8 +1,8 @@
 # NeuroSight AI — Frontend
 
 React 18 + TypeScript + Vite 5 + Tailwind 3 dashboard for the NeuroSight AI API.
-Design tokens and interaction rules: `docs/plan/04-UI-UX-BRIEF.md` (+ the captured
-Stitch "Precision Neurodiagnostic" system). Screens: `docs/plan/03-APP-FLOW.md`.
+Design tokens and interaction rules: `docs/plan/04-UI-UX-BRIEF.md` ("Precision
+Neurodiagnostic" design system). Screens: `docs/plan/03-APP-FLOW.md`.
 
 ## Develop
 

@@ -325,8 +325,8 @@ def load_facts() -> dict:
                     desc,
                     f"{mean:.4f}",
                     f"{std:.4f}",
-                    "" if ece_raw == "" else f"{ece_raw:.4f}",
-                    "" if ece_scaled == "" else f"{ece_scaled:.4f}",
+                    "N/A*" if ece_raw == "" else f"{ece_raw:.4f}",
+                    "N/A*" if ece_scaled == "" else f"{ece_scaled:.4f}",
                     _fmt_delta(delta),
                 )
                 for sid, desc, mean, std, ece_raw, ece_scaled, delta in system_rows
@@ -713,8 +713,9 @@ def build_pdf(facts: dict) -> tuple[int, dict[str, int]]:
     )
     story.append(
         Paragraph(
-            "S0 equals S1a by construction (same checkpoints, same scoring). Selection rule: max mean "
-            "CV AUC, tie by ECE, test set untouched (plan guardrails 1 and 2).",
+            "S0 equals S1a by construction (same checkpoints, same scoring). * S0 ECE was not measured "
+            "in the initial 5-fold CV ablation artifact; measured as 0.1998 raw / 0.2512 scaled under S1a. "
+            "Selection rule: max mean CV AUC, tie by ECE, test set untouched (plan guardrails 1 and 2).",
             styles["caption"],
         )
     )

@@ -143,9 +143,34 @@ def create_app(
         visit_labels_json: str | None = Form(None),
         include_gradcam: bool = Form(True),
     ):
+        max_bytes = cfg.max_upload_mb * 1024 * 1024
+        total_read = 0
+        chunk_size = 64 * 1024
         blobs: list[tuple[str, bytes]] = []
-        for f in files:
-            blobs.append((f.filename or "unnamed", await f.read()))
+        try:
+            for f in files:
+                chunks: list[bytes] = []
+                while True:
+                    chunk = await f.read(chunk_size)
+                    if not chunk:
+                        break
+                    total_read += len(chunk)
+                    if total_read > max_bytes:
+                        raise HTTPException(
+                            status_code=413,
+                            detail=(
+                                f"Upload payload exceeds maximum allowed size of "
+                                f"{cfg.max_upload_mb} MB"
+                            ),
+                        )
+                    chunks.append(chunk)
+                blobs.append((f.filename or "unnamed", b"".join(chunks)))
+        finally:
+            for f in files:
+                try:
+                    await f.close()
+                except Exception:
+                    pass
         # visit_labels_json: JSON LIST parallel to files (browsers strip folder
         # paths, so the client supplies the visit for each file explicitly);
         # malformed JSON is a client error -> 422, never a 500

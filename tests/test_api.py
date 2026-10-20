@@ -583,3 +583,54 @@ def test_e5_synthetic_two_visit_inference_and_gradcam(tmp_path: Path, monkeypatc
             assert set(g_visit["slices"]) == {"10", "16", "24"}
             for s in ("10", "16", "24"):
                 assert len(g_visit["images"][s]) > 100  # valid base64 PNG string
+
+
+def test_upload_exceeding_max_size_returns_413(tmp_path: Path, monkeypatch) -> None:
+    """Uploads exceeding max_upload_mb must immediately be rejected with HTTP 413."""
+    monkeypatch.setenv("NEUROSIGHT_API_KEY", "test-key-123")
+    serving = tmp_path / "configs" / "serving.yaml"
+    serving.parent.mkdir(parents=True, exist_ok=True)
+    up = (tmp_path / "uploads").as_posix()
+    md = (tmp_path / "models").as_posix()
+    db = (tmp_path / "jobs.db").as_posix()
+    serving.write_text(
+        "serving:\n"
+        '  host: "127.0.0.1"\n'
+        "  port: 8000\n"
+        '  api_key_env: "NEUROSIGHT_API_KEY"\n'
+        "  max_upload_mb: 1\n"
+        f'  uploads_dir: "{up}"\n'
+        f'  models_dir: "{md}"\n'
+        f'  db_path: "{db}"\n',
+        encoding="utf-8",
+    )
+    for name, file_content in YAML.items():
+        if file_content:
+            (tmp_path / "configs" / name).write_text(file_content, encoding="utf-8")
+
+    from neurosight.config import ModelConfig
+    from neurosight.models.registry import build_model
+
+    ckpt_dir = tmp_path / "models"
+    ckpt_dir.mkdir(parents=True, exist_ok=True)
+    m = build_model("3_cnn_lstm", ModelConfig())
+    save_checkpoint(ckpt_dir / "best_3_cnn_lstm_final_3_cnn_lstm_mri_only.pth", m)
+    (ckpt_dir / "manifest.json").write_text(
+        json.dumps(
+            {
+                "active_model": "3_cnn_lstm",
+                "checkpoint": "best_3_cnn_lstm_final_3_cnn_lstm_mri_only.pth",
+                "temperature": 1.0,
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    app = create_app(config_dir=str(tmp_path / "configs"))
+    client = TestClient(app, headers={"X-API-Key": "test-key-123"})
+
+    # Send a 1.2 MB file (> 1 MB limit)
+    oversized = b"0" * (1024 * 1024 + 200 * 1024)
+    r = client.post("/api/v1/analyses", files=[("files", ("scan.nii", oversized))])
+    assert r.status_code == 413
+    assert "exceeds maximum allowed size" in r.json()["detail"]

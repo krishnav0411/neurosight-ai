@@ -61,6 +61,16 @@ def resolve_final_checkpoint(checkpoint_dir: str | Path, model_key: str, input_m
 )
 @click.option("--calibrate/--no-calibrate", default=True)
 @click.option("--gradcam/--no-gradcam", default=True)
+@click.option(
+    "--manifest-path",
+    default=None,
+    help="Target path for evaluation manifest (defaults to reports/evaluation_manifest.json)",
+)
+@click.option(
+    "--force-manifest/--no-force-manifest",
+    default=False,
+    help="Allow overwriting active serving manifest at models/manifest.json if explicitly targeted",
+)
 def main(
     config_dir: str,
     model_key: str,
@@ -68,6 +78,8 @@ def main(
     run_name: str | None,
     calibrate: bool,
     gradcam: bool,
+    manifest_path: str | None = None,
+    force_manifest: bool = False,
 ) -> None:
     cfg = load_config(config_dir)
     model_cfg = cfg.model.model_copy(update={"input_mode": input_mode})
@@ -178,7 +190,26 @@ def main(
         },
         "git_state": "see git log",
     }
-    Path("models/manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    target_manifest = (
+        Path(manifest_path) if manifest_path else Path("reports/evaluation_manifest.json")
+    )
+    canonical_serving = Path("models/manifest.json")
+    if target_manifest.resolve() == canonical_serving.resolve() and canonical_serving.exists():
+        try:
+            existing = json.loads(canonical_serving.read_text(encoding="utf-8"))
+            if existing.get("active_system") == "neurosight-e5" and not force_manifest:
+                logger.warning(
+                    "Refusing to overwrite active E5 serving manifest at %s without "
+                    "--force-manifest. Writing evaluation manifest to "
+                    "reports/evaluation_manifest.json instead.",
+                    canonical_serving,
+                )
+                target_manifest = Path("reports/evaluation_manifest.json")
+        except Exception:
+            pass
+    target_manifest.parent.mkdir(parents=True, exist_ok=True)
+    target_manifest.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    logger.info("Evaluation manifest saved to %s", target_manifest)
 
     # ── Grad-CAM evidence for the first test patient ─────────────────────────
     if gradcam and fam == "2d":

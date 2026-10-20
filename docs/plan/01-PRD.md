@@ -2,7 +2,7 @@
 
 **Project:** NeuroSight AI — Longitudinal MRI Dementia Analysis
 **Version:** 1.0 · 2026-09-14 · Status: approved for engineering planning
-**Source assets:** `D:\AI Project\` (OASIS-2 dataset, three generations of code, reports), upgrade proposal `neurosight_new_plan.md` (superseded — see `00-PLAN-REVIEW.md`).
+**Source assets:** Local OASIS-2 dataset, baseline pipeline code, reports, legacy upgrade proposal (superseded — see `00-PLAN-REVIEW.md`).
 
 ---
 
@@ -41,7 +41,7 @@ Dementia diagnosis today relies on cognitive testing (MMSE, CDR) and subjective 
 
 ## 4. Functional requirements
 
-**FR-1 Data** — The pipeline must run from a config that points at `D:\AI Project\Datasets\OAS2_RAW_PART1|PART2` and a demographics CSV; it must schema-validate the CSV (columns `Subject ID, MRI ID, Group, Visit, MR Delay, M/F, Age, EDUC, SES, MMSE, CDR, eTIV, nWBV, ASF`; 373 rows; group counts within documented tolerance), match sessions to raw folders, and emit a `data_audit.json` (matched/missing per subject). Missing session → warn + skip; CSV row without raw data → recorded, never silently dropped.
+**FR-1 Data** — The pipeline must run from a config that points at `data/raw/OAS2_RAW_PART1|PART2` and a demographics CSV; it must schema-validate the CSV (columns `Subject ID, MRI ID, Group, Visit, MR Delay, M/F, Age, EDUC, SES, MMSE, CDR, eTIV, nWBV, ASF`; 373 rows; group counts within documented tolerance), match sessions to raw folders, and emit a `data_audit.json` (matched/missing per subject). Missing session → warn + skip; CSV row without raw data → recorded, never silently dropped.
 
 **FR-2 Preprocessing** — Deterministic: shape fix → z-score → 32 middle slices (strategy configurable: middle/uniform/entropy) → 128×128 resize; 3D path to (64,128,128). Any load failure **raises** (no zero-tensor substitution). mpr-series policy configurable (`first` default, `middle`, `mean`), logged per session. Train-time augmentation: ±2 slice shift, Gaussian noise σ=0.02, h-flip p=0.3, intensity jitter ±5%, visit-dropout p=0.3 (≥2 visits kept).
 

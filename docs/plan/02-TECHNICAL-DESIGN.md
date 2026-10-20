@@ -1,7 +1,7 @@
 # 02 — Technical Design
 
 **Project:** NeuroSight AI · v1.0 · 2026-09-14
-**Inputs:** `01-PRD.md` (requirements), `00-PLAN-REVIEW.md` (defects driving these decisions), existing code in `D:\AI Project\src\` (ported, not rewritten).
+**Inputs:** `01-PRD.md` (requirements), `00-PLAN-REVIEW.md` (defects driving these decisions), existing baseline code in `src/` (ported, not rewritten).
 
 ---
 
@@ -9,9 +9,9 @@
 
 ```
                          ┌────────────────────────────────────────────────┐
-                         │                D:\NeuroSight-AI\               │
-   OASIS-2 (D:\AI        │                                                │
-   Project\Datasets) ───►│  configs/ (YAML) ──► src/neurosight/           │
+                         │                neurosight-ai/               │
+   OASIS-2 (data/raw        │                                                │
+   folder) ─────────────►│  configs/ (YAML) ──► src/neurosight/           │
    + demographics CSV    │                       data/      models/       │
                          │                       training/  evaluation/   │
                          │                       inference/ reporting/    │
@@ -48,9 +48,9 @@ The preprocessing/labeling code is **shared verbatim** between planes — a sing
 ### 3.1 Package layout
 
 ```
-D:\NeuroSight-AI\
+neurosight-ai/
 ├── configs/                 data.yaml · model.yaml · training.yaml · serving.yaml
-├── data/                    raw/ (symlink/junction to D:\AI Project\Datasets) · metadata/ · processed/ · uploads/
+├── data/                    raw/ (local or mapped directory) · metadata/ · processed/ · uploads/
 ├── src/neurosight/
 │   ├── config.py            Pydantic schemas: DataConfig, ModelConfig, TrainingConfig, ServingConfig; load_config()
 │   ├── data/

@@ -4,7 +4,7 @@ Six-document build system (PRD → Technical Design → App Flow → UI/UX Brief
 
 | # | Document | Read it for |
 |---|----------|-------------|
-| 00 | [PLAN-REVIEW.md](00-PLAN-REVIEW.md) | Why `neurosight_new_plan.md` is not executable as written (3 fatal, 5 scientific, 12 engineering defects) and what changed |
+| 00 | [PLAN-REVIEW.md](00-PLAN-REVIEW.md) | Why the legacy upgrade proposal is not executable as written (3 fatal, 5 scientific, 12 engineering defects) and what changed |
 | 01 | [01-PRD.md](01-PRD.md) | Users, scope, functional/non-functional requirements, honest success criteria, risks |
 | 02 | [02-TECHNICAL-DESIGN.md](02-TECHNICAL-DESIGN.md) | Architecture, decisions & trade-offs, package layout, training/serving protocols, constraints |
 | 03 | [03-APP-FLOW.md](03-APP-FLOW.md) | Routes, wizard journeys, every UI state and action |

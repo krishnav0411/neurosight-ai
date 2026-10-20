@@ -8,11 +8,39 @@ import React from "react";
 import { useModelCard } from "../api/hooks";
 import { DisclaimerBanner } from "../components/DisclaimerBanner";
 
-function renderMarkdown(content: string): React.ReactNode {
+export function formatDigestValue(key: string, value: unknown): string {
+  if (Array.isArray(value)) {
+    if (value.length === 2 && value.every((v) => typeof v === "number")) {
+      return `[${(value[0] * 100).toFixed(1)}%, ${(value[1] * 100).toFixed(1)}%]`;
+    }
+    return value
+      .map((v) =>
+        typeof v === "number"
+          ? Number.isInteger(v)
+            ? String(v)
+            : v.toFixed(3)
+          : String(v),
+      )
+      .join(", ");
+  }
+  if (typeof value === "number" && Number.isFinite(value)) {
+    if (key.includes("acc") || key.includes("coverage") || key.includes("rate")) {
+      return `${(value * 100).toFixed(1)}%`;
+    }
+    if (Number.isInteger(value)) {
+      return String(value);
+    }
+    return value.toFixed(3);
+  }
+  return String(value);
+}
+
+export function renderMarkdown(content: string): React.ReactNode {
   const lines = content.split("\n");
   const elements: React.ReactNode[] = [];
   let inList = false;
   let listItems: React.ReactNode[] = [];
+  let tableLines: string[] = [];
 
   const flushList = (key: string) => {
     if (inList && listItems.length > 0) {
@@ -60,8 +88,93 @@ function renderMarkdown(content: string): React.ReactNode {
     return parts.length > 0 ? parts : text;
   };
 
+  const flushTable = (key: string) => {
+    if (tableLines.length >= 2) {
+      const headerLine = tableLines[0];
+      const delimiterLine = tableLines[1];
+      const headerCells = headerLine
+        .split("|")
+        .slice(1, -1)
+        .map((c) => c.trim());
+      const delimiterCells = delimiterLine
+        .split("|")
+        .slice(1, -1)
+        .map((c) => c.trim());
+
+      const isDelimiter =
+        delimiterCells.length > 0 &&
+        delimiterCells.every((cell) => /^:?-+:?$/.test(cell));
+
+      if (isDelimiter && headerCells.length === delimiterCells.length) {
+        const bodyRows = tableLines.slice(2).map((rowLine) =>
+          rowLine
+            .split("|")
+            .slice(1, -1)
+            .map((c) => c.trim()),
+        );
+
+        elements.push(
+          <div
+            key={key}
+            className="my-4 overflow-x-auto rounded-control border border-hairline"
+          >
+            <table className="w-full text-left text-[13px]">
+              <thead>
+                <tr className="border-b border-hairline bg-slate-50 text-ink2">
+                  {headerCells.map((h, hi) => (
+                    <th key={hi} scope="col" className="px-3 py-2 font-medium">
+                      {formatInline(h)}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {bodyRows.map((row, ri) => (
+                  <tr
+                    key={ri}
+                    className="border-b border-hairline last:border-b-0 hover:bg-slate-50/50"
+                  >
+                    {row.map((cell, ci) => (
+                      <td key={ci} className="px-3 py-2 text-ink">
+                        {formatInline(cell)}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>,
+        );
+        tableLines = [];
+        return;
+      }
+    }
+
+    tableLines.forEach((tblLine, tIdx) => {
+      elements.push(
+        <p
+          key={`${key}-raw-${tIdx}`}
+          className="my-1 whitespace-pre-wrap text-[13px] leading-5 text-ink2"
+        >
+          {formatInline(tblLine)}
+        </p>,
+      );
+    });
+    tableLines = [];
+  };
+
   lines.forEach((line, i) => {
     const trimmed = line.trim();
+    if (trimmed.startsWith("|") && trimmed.endsWith("|")) {
+      flushList(`flush-${i}`);
+      tableLines.push(trimmed);
+      return;
+    }
+
+    if (tableLines.length > 0) {
+      flushTable(`table-${i}`);
+    }
+
     if (trimmed.startsWith("### ")) {
       flushList(`flush-${i}`);
       elements.push(
@@ -111,6 +224,9 @@ function renderMarkdown(content: string): React.ReactNode {
     }
   });
   flushList("flush-end");
+  if (tableLines.length > 0) {
+    flushTable("table-end");
+  }
   return elements;
 }
 
@@ -133,12 +249,15 @@ function DigestTable({ digest }: { digest: Record<string, unknown> }) {
         </thead>
         <tbody>
           {entries.map(([key, value]) => {
-            const isNumber = typeof value === "number" && Number.isFinite(value);
+            const formatted = formatDigestValue(key, value);
+            const isNumeric =
+              typeof value === "number" ||
+              (Array.isArray(value) && value.every((v) => typeof v === "number"));
             return (
               <tr key={key} className="border-b border-hairline last:border-b-0">
                 <td className="px-3 py-2 text-ink2">{key}</td>
-                <td className={`px-3 py-2 text-ink ${isNumber ? "tnum" : ""}`}>
-                  {String(value)}
+                <td className={`px-3 py-2 text-ink ${isNumeric ? "tnum" : ""}`}>
+                  {formatted}
                 </td>
               </tr>
             );

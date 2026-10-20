@@ -30,5 +30,5 @@
   "mcc": 0.18257418583505536,
   "ece": 0.3484853550114415,
   "temperature": 0.37512481212615967,
-  "checkpoint": "D:\\NeuroSight-AI\\models\\best_7_dual_attn_final_7_dual_attn_mri_only.pth"
+  "checkpoint": "models/best_7_dual_attn_final_7_dual_attn_mri_only.pth"
 }

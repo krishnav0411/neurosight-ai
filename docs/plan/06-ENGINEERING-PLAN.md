@@ -3,19 +3,19 @@
 **Project:** NeuroSight AI · v1.0 · 2026-09-14
 **Format:** tasks in dependency order with **tests** and **done criteria** (per the 6-Document Build System). Estimated effort assumes one engineer + AI agent on the dev box (Windows 11, RTX 4050 6 GB). Training wall-clock is called out separately from build time — the old plan's "30 min per phase" conflated them.
 
-**Legend:** dep = prerequisite tasks. Every task ends with its DoD (definition of done). Where a task ports code from `D:\AI Project\src\`, the source file is named — port means: copy logic, fix the named defects, add types/tests, wire to config (no behavior re-invention).
+**Legend:** dep = prerequisite tasks. Every task ends with its DoD (definition of done). Where a task ports code from baseline implementations, the source file is named — port means: copy logic, fix the named defects, add types/tests, wire to config (no behavior re-invention).
 
 ---
 
 ## Milestone M0 — Foundations (est. 0.5 day + no training)
 
 **T0.1 Repo scaffold** — dep: none.
-Create `D:\NeuroSight-AI\` exactly as `02-TECHNICAL-DESIGN.md` §3.1; `pyproject.toml` (package `neurosight`, src layout, deps per doc 02 §5); `requirements.lock` via pip-compile; `.gitignore` (data/, models/, mlruns/, uploads, .env, __pycache__, node_modules); `git init` + initial commit; junction `data\raw → D:\AI Project\Datasets`.
+Create repository scaffold exactly as `02-TECHNICAL-DESIGN.md` §3.1; `pyproject.toml` (package `neurosight`, src layout, deps per doc 02 §5); `requirements.lock` via pip-compile; `.gitignore` (data/, models/, mlruns/, uploads, .env, __pycache__, node_modules); `git init` + initial commit.
 **DoD:** `pip install -e .` succeeds; `python -c "import neurosight"` works; `git log` has the scaffold commit.
 
 **T0.2 Config system** — dep: T0.1.
 Port Task-0.2 intent: `src/neurosight/config.py` with Pydantic models `DataConfig, ModelConfig, TrainingConfig, ServingConfig` + `load_config(config_dir)`. Add the fields the old plan missed: `series_selection: Literal["first","middle","mean"]="first"`, `input_mode`, `min_visits=2`, `deterministic=True`, `cudnn_benchmark=False`, `label_mode="binary_cdr"`.
-Write `configs/data.yaml, model.yaml, training.yaml, serving.yaml` with real paths (`D:\AI Project\Datasets\OAS2_RAW_PART1|PART2`, `metadata/oasis_longitudinal_demographics.csv`).
+Write `configs/data.yaml, model.yaml, training.yaml, serving.yaml` with real paths (`data/raw/OAS2_RAW_PART1|PART2`, `data/metadata/oasis_longitudinal_demographics.csv`).
 **Tests:** invalid YAML → clear `ValidationError` naming the field; unknown key rejected; defaults stable.
 **DoD:** `load_config("configs")` returns 4 typed objects; test green.
 
@@ -46,7 +46,7 @@ Reference distributions (validated 2026-09-14 against the real `Datasets/oasis_l
 **DoD:** `data_audit.json` written; ≥ 360/373 matched; numbers printed; audit file committed.
 
 **T1.4 Loader port + subject-level leakage-safe splits** — dep: T0.2, T1.3.
-Port `D:\AI Project\src\data_loader.py` → `neurosight/data/loader.py` with the fixes from `00-PLAN-REVIEW.md`: config-driven paths; **subject-level split before** Converted pre/post sequence splitting; `label_mode="binary_cdr"` (keep `per_visit`/`majority` options); `series_selection` policy implemented (`first` = lowest `mpr-N`; `middle`; `mean` = voxel-mean stack); metadata vector unchanged + per-dim mask vector for input modes; no silent skip — every exclusion logged with reason and counted.
+Port `data_loader.py` → `neurosight/data/loader.py` with the fixes from `00-PLAN-REVIEW.md`: config-driven paths; **subject-level split before** Converted pre/post sequence splitting; `label_mode="binary_cdr"` (keep `per_visit`/`majority` options); `series_selection` policy implemented (`first` = lowest `mpr-N`; `middle`; `mean` = voxel-mean stack); metadata vector unchanged + per-dim mask vector for input modes; no silent skip — every exclusion logged with reason and counted.
 **Tests:** (a) **leakage test** — assert zero subject-id overlap across train/val/test **and** across CV folds, including Converted straddle case built from a synthetic 6-subject CSV; (b) series policy returns expected path per fixture tree; (c) metadata mask zeros the right dims per mode; (d) label derivation `CDR==0→0 else 1` matches reference table.
 **DoD:** loader builds N sequences from real data (expected range 120–260 incl. Converted splits — record actual); all tests green; printed class distribution committed to `reports/data_audit.json`.
 
@@ -65,7 +65,7 @@ Port `src/dataset.py` → `neurosight/data/dataset.py` (2D/3D/inference datasets
 ## Milestone M3 — Models (est. 1 day)
 
 **T3.1 Model registry port** — dep: T0.2.
-Port all 7 model files from `D:\AI Project\src\models\` into `neurosight/models/` unchanged in math; add `registry.py` (11-variant `ABLATION_VARIANTS` from `src/ablation.py`, incl. ResNet18-LSTM) + `build_model(key, ModelConfig)`; every forward keeps `meta` arg (mode-masked upstream).
+Port model files from `src/models/` into `neurosight/models/` unchanged in math; add `registry.py` (11-variant `ABLATION_VARIANTS` from `src/ablation.py`, incl. ResNet18-LSTM) + `build_model(key, ModelConfig)`; every forward keeps `meta` arg (mode-masked upstream).
 **Tests:** forward-shape test per variant (2D: `(2,3,32,128,128)→(2,2)`; 3D variants with their shapes); param counts within ±2% of reference values (530K–1.4M customs, ~11M ResNet-LSTM); masked-LSTM variants produce no NaN with zero-padded batch; registry rejects unknown keys.
 **DoD:** all 11 variants instantiate and forward on CPU; test marks total param counts into a committed fixture JSON.
 

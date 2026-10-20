@@ -18,7 +18,11 @@ const useModelCardMock = vi.mocked(useModelCard);
 
 const CARD: ModelCard = {
   content: "MODEL CARD TEXT",
-  metrics_digest: { test_acc: 0.591, backbone: "resnet18" },
+  metrics_digest: {
+    test_acc: 0.591,
+    test_acc_ci: [0.36363636363636365, 0.7727272727272727],
+    backbone: "resnet18",
+  },
 };
 
 function result(
@@ -51,18 +55,50 @@ describe("AboutPage", () => {
     expect(text).toHaveClass("whitespace-pre-wrap");
   });
 
-  it("renders the metrics digest as a two-column table with tnum numeric cells", () => {
+  it("renders the metrics digest as a two-column table with formatted values and tnum", () => {
     useModelCardMock.mockReturnValue(result());
     render(<AboutPage />);
 
-    const acc = screen.getByText("0.591");
+    const acc = screen.getByText("59.1%");
     expect(acc.tagName).toBe("TD");
     expect(acc).toHaveClass("tnum");
 
     // Key column shows the metric name, value column sits beside it.
     expect(acc.parentElement).toHaveTextContent("test_acc");
+
+    // Array CI is sensibly formatted into percentage bounds
+    const ci = screen.getByText("[36.4%, 77.3%]");
+    expect(ci.tagName).toBe("TD");
+    expect(ci).toHaveClass("tnum");
+
     // Non-numeric values render without forcing tnum formatting.
     expect(screen.getByText("resnet18")).toBeInTheDocument();
+  });
+
+  it("renders markdown tables in model card content as semantic HTML tables", () => {
+    const tableMarkdown = [
+      "## Evaluation Table",
+      "| Metric | NeuroSight-E5 | Champion v1 |",
+      "|---|---|---|",
+      "| Accuracy | **59.1%** | 59.1% |",
+      "| AUC-ROC | 0.777 | 0.785 |",
+    ].join("\n");
+
+    useModelCardMock.mockReturnValue(
+      result({
+        data: {
+          content: tableMarkdown,
+          metrics_digest: null,
+        },
+      }),
+    );
+    render(<AboutPage />);
+
+    expect(screen.getByRole("table")).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "Metric" })).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "NeuroSight-E5" })).toBeInTheDocument();
+    expect(screen.getByRole("cell", { name: "Accuracy" })).toBeInTheDocument();
+    expect(screen.getByRole("cell", { name: "AUC-ROC" })).toBeInTheDocument();
   });
 
   it("renders a pulse skeleton while loading", () => {
