@@ -27,9 +27,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Install CPU-only torch first (avoids 2.5GB CUDA wheels in CI)
-        run: pip install torch --index-url https://download.pytorch.org/whl/cpu
-      - run: pip install -e ".[dev]" httpx httpx2
+      - name: Install CPU-only torch and torchvision first (avoids 2.5GB CUDA wheels in CI)
+        run: pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+      - run: pip install -e ".[dev]"
       - run: pytest -q
       - name: Type check
         run: mypy
