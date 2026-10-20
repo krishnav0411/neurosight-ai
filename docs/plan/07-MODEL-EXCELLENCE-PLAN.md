@@ -8,11 +8,11 @@
 
 | | Current (champion v1 `7_dual_attn`) |
 |---|---|
-| Mean CV AUC | 0.744 ± 0.097 (folds: .772/.636/.868/.817/.629) |
+| Mean CV AUC | 0.744 ± 0.096 (folds: .772/.636/.868/.817/.629) |
 | Held-out test (n=22, touched once) | acc 59.1% [36.4–77.3], AUC 0.785, F1 0.571 |
 | Calibration | val ECE 0.118→0.041 (T=0.375); **test ECE 0.30–0.35 — poor** |
 
-**Target system "NeuroSight-E5":** 5-seed ensemble of `7_dual_attn` (seeds 42–46, final-model training) + TTA (identity, h-flip, slice-shift ±2) + temperature fitted per fold on val + split-conformal prediction sets (90% coverage). Success: **mean CV AUC ≥ 0.78** (outside v1's ±0.097 or McNemar p<0.05), **val ECE ≤ 0.10**, conformal coverage ∈ [0.85, 0.95] — then ONE bake-off on the untouched test set. Literature grounding: deep ensembles are strongest in low-data regimes ([Lakshminarayanan 2017](https://papers.nips.cc/paper/7219-simple-and-scalable-predictive-uncertainty-estimation-using-deep-ensembles)); TTA +0.5–3 pts with medically-plausible transforms only; conformal sets = clinical deployment standard ([CHEST 2025](https://journal.chestnet.org/article/S0012-3692(25)05184-0/fulltext), [PMC review](https://pmc.ncbi.nlm.nih.gov/articles/PMC9309105/)); temperature-ensemble interaction must be measured ([Rahaman NeurIPS 2021](https://dl.acm.org/doi/10.5555/3540261.3541796)).
+**Target system "NeuroSight-E5":** 5-seed ensemble of `7_dual_attn` (seeds 42–46, final-model training) + TTA (identity, h-flip, slice-shift ±2) + temperature fitted per fold on val + split-conformal prediction sets (90% coverage). Success: **mean CV AUC ≥ 0.78** (outside v1's ±0.096 or McNemar p<0.05), **val ECE ≤ 0.10**, conformal coverage ∈ [0.85, 0.95] — then ONE bake-off on the untouched test set. Literature grounding: deep ensembles are strongest in low-data regimes ([Lakshminarayanan 2017](https://papers.nips.cc/paper/7219-simple-and-scalable-predictive-uncertainty-estimation-using-deep-ensembles)); TTA +0.5–3 pts with medically-plausible transforms only; conformal sets = clinical deployment standard ([CHEST 2025](https://journal.chestnet.org/article/S0012-3692(25)05184-0/fulltext), [PMC review](https://pmc.ncbi.nlm.nih.gov/articles/PMC9309105/)); temperature-ensemble interaction must be measured ([Rahaman NeurIPS 2021](https://dl.acm.org/doi/10.5555/3540261.3541796)).
 
 ## 1. Guardrails (unchanged, binding)
 

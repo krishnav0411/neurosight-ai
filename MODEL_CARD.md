@@ -40,7 +40,7 @@ them would be leakage).
 
 | Metric | Value |
 |--------|-------|
-| Mean CV AUC | **0.744 ± 0.097** (folds: .772/.636/.868/.817/.629) |
+| Mean CV AUC | **0.744 ± 0.096** (folds: .772/.636/.868/.817/.629) |
 
 ### Held-out test (n = 22 — touched exactly once, pre-declared)
 

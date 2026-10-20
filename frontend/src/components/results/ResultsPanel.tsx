@@ -1,6 +1,6 @@
 /**
  * Results dashboard: a subject header
- * strip, a two-column top row (Primary Clinical Diagnosis + Longitudinal
+ * strip, a two-column top row (Classification Estimate + Longitudinal
  * progression, or a single-visit chip), the interpretable attention maps,
  * the action row and — always last — the research-use disclaimer.
  */

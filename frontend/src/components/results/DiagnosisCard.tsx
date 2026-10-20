@@ -1,5 +1,5 @@
 /**
- * Headline result card ("Primary Clinical Diagnosis"): diagnosis badge,
+ * Headline result card ("Classification Estimate (Research)"): diagnosis badge,
  * large calibrated confidence with a "Calibrated" chip, the two slim
  * probability rows and the risk pill. When the calibrated confidence band
  * is low, an amber alert renders above the card marking the result as
