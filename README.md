@@ -188,7 +188,7 @@ pytest -v
 ruff check .
 black --check .
 
-# Frontend unit & component tests (150 tests across 21 files)
+# Frontend unit & component tests (151 tests across 21 files)
 cd frontend
 npm test
 
