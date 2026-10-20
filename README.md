@@ -115,7 +115,7 @@ Longitudinal MRI Scan Series (Visits 1..T)
 
 ### 1. Clone Repository & Install Backend
 ```bash
-git clone https://github.com/<your-username>/neurosight-ai.git
+git clone https://github.com/krishnav0411/neurosight-ai.git
 cd neurosight-ai
 
 # Create virtual environment
