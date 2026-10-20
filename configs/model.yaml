@@ -1,0 +1,13 @@
+# NeuroSight AI — model configuration.
+# model_key must be a key of neurosight.models.registry.ABLATION_VARIANTS (validated at M3 build time).
+model:
+  model_key: "3_cnn_lstm"
+  input_mode: "mri_only"       # mri_only | demo_only | mri_demo | mri_clinical
+  lstm_hidden: 32
+  dropout: 0.5
+  d_model: 64
+  nhead: 4
+  num_layers: 2
+  num_classes: 2
+  use_conversion_head: true    # T2 conversion-risk head (exploratory, see plan T5.4)
+  freeze_backbone: true        # applies to transfer variants (11_resnet_lstm)

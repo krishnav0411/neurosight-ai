@@ -1,0 +1,34 @@
+{
+  "model": "7_dual_attn (final)",
+  "input_mode": "mri_only",
+  "n_test": 22,
+  "parameters": 543036,
+  "accuracy": 0.5909090909090909,
+  "balanced_accuracy": 0.5909090909090908,
+  "accuracy_ci": [
+    0.36363636363636365,
+    0.7727272727272727
+  ],
+  "auc_roc": 0.7851239669421488,
+  "avg_precision": 0.7688402506584324,
+  "confusion_matrix": [
+    [
+      7,
+      4
+    ],
+    [
+      5,
+      6
+    ]
+  ],
+  "sensitivity": 0.5454545454545454,
+  "specificity": 0.6363636363636364,
+  "precision": 0.6,
+  "recall": 0.5454545454545454,
+  "f1": 0.5714285714285714,
+  "f1_macro": 0.5900621118012422,
+  "mcc": 0.18257418583505536,
+  "ece": 0.3484853550114415,
+  "temperature": 0.37512481212615967,
+  "checkpoint": "D:\\NeuroSight-AI\\models\\best_7_dual_attn_final_7_dual_attn_mri_only.pth"
+}

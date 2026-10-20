@@ -1,0 +1,21 @@
+# NeuroSight AI — serving configuration (FastAPI plane, milestone M6).
+# Secrets are read from the environment only (api_key_env names the variable).
+serving:
+  host: "127.0.0.1"
+  port: 8000
+  api_key_env: "NEUROSIGHT_API_KEY"
+  cors_origins:
+    - "http://localhost:5173"
+    - "http://localhost:4173"
+    - "http://localhost:80"
+
+  max_upload_mb: 512
+  max_visits: 8
+  max_series_per_visit: 4
+  retention_days: 7            # upload purge window (PHI posture, plan doc 05 §4)
+  worker_concurrency: 1        # single GPU worker
+  public: false                # /docs disabled when false
+
+  models_dir: "models"
+  uploads_dir: "data/uploads"
+  db_path: "data/neurosight.db"

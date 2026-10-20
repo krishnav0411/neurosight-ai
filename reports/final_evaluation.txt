@@ -1,0 +1,11 @@
+==============================================================================
+  NeuroSight AI — Evaluation Report
+==============================================================================
+
+  Model                    Mode          Acc      95% CI           AUC      F1       Sens    Spec    ECE
+  ────────────────────────────────────────────────────────────────────────────────────────
+  7_dual_attn              mri_only        59.1%  [36.4,77.3] 0.7851   0.5714   0.545   0.636   0.348
+
+  [7_dual_attn] n=22 mode=mri_only balanced_acc=0.591 mcc=0.183 TN=7 FP=4 FN=5 TP=6
+
+  Small test sets (n≈22) give wide CIs — treat point estimates with caution.

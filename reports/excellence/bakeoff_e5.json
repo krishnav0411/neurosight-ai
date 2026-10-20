@@ -1,0 +1,51 @@
+{
+  "model": "NeuroSight-E5 (5-seed ensemble)",
+  "input_mode": "mri_only",
+  "n_test": 22,
+  "parameters": 0,
+  "accuracy": 0.5909090909090909,
+  "balanced_accuracy": 0.5909090909090908,
+  "accuracy_ci": [
+    0.36363636363636365,
+    0.7727272727272727
+  ],
+  "auc_roc": 0.7768595041322314,
+  "avg_precision": 0.7039051857233674,
+  "confusion_matrix": [
+    [
+      7,
+      4
+    ],
+    [
+      5,
+      6
+    ]
+  ],
+  "sensitivity": 0.5454545454545454,
+  "specificity": 0.6363636363636364,
+  "precision": 0.6,
+  "recall": 0.5454545454545454,
+  "f1": 0.5714285714285714,
+  "f1_macro": 0.5900621118012422,
+  "mcc": 0.18257418583505536,
+  "ece": 0.22716159925796567,
+  "ece_raw": 0.2734474837779999,
+  "temperature": 0.6573030948638916,
+  "conformal_threshold": 0.4697126206685873,
+  "conformal_coverage": 0.5454545454545454,
+  "conformal_mean_set_size": 0.8636363636363636,
+  "mcnemar_vs_champion_v1": {
+    "chi2": 0.0,
+    "p": 1.0
+  },
+  "v1_test_accuracy": 0.5909090909090909,
+  "members": [
+    "s42",
+    "s43",
+    "s44",
+    "s45",
+    "s46"
+  ],
+  "test_n": 22,
+  "accuracy_mean_boot": 0.592090909090909
+}

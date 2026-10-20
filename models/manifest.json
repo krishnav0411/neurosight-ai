@@ -1,0 +1,27 @@
+{
+  "active_system": "neurosight-e5",
+  "model_key": "7_dual_attn",
+  "input_mode": "mri_only",
+  "members": {
+    "s42": "best_7_dual_attn_final_7_dual_attn_mri_only.pth",
+    "s43": "best_7_dual_attn_final_7_dual_attn_mri_only_s43.pth",
+    "s44": "best_7_dual_attn_final_7_dual_attn_mri_only_s44.pth",
+    "s45": "best_7_dual_attn_final_7_dual_attn_mri_only_s45.pth",
+    "s46": "best_7_dual_attn_final_7_dual_attn_mri_only_s46.pth"
+  },
+  "temperature": 0.6573030948638916,
+  "conformal_threshold": 0.4697126206685873,
+  "metrics_digest": {
+    "test_acc": 0.5909090909090909,
+    "test_acc_ci": [
+      0.36363636363636365,
+      0.7727272727272727
+    ],
+    "test_auc": 0.7768595041322314,
+    "f1": 0.5714285714285714,
+    "ece": 0.22716159925796567,
+    "ece_raw": 0.2734474837779999,
+    "conformal_coverage": 0.5454545454545454,
+    "n_test": 22
+  }
+}

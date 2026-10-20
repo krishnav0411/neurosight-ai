@@ -1,0 +1,23 @@
+# NeuroSight AI — data configuration.
+# Canonical OASIS-2 raw dataset can be mapped via data/raw junction or configured below.
+# The csv_path is repo-internal (data/metadata) so it moves with the repo.
+data:
+  csv_path: "data/metadata/oasis_longitudinal.csv"
+  raw_paths:
+    - "data/raw/OAS2_RAW_PART1"
+    - "data/raw/OAS2_RAW_PART2"
+  processed_dir: "data/processed"
+  uploads_dir: "data/uploads"
+
+  min_visits: 2
+  num_slices: 32
+  slice_size: 128
+  vol_depth: 64
+  slice_strategy: "middle"     # middle | uniform | entropy
+  series_selection: "first"    # first | middle | mean  (policy for mpr-1..N per session)
+  label_mode: "binary_cdr"     # binary_cdr | per_visit | majority
+
+  train_ratio: 0.70
+  val_ratio: 0.15
+  test_ratio: 0.15
+  random_seed: 42

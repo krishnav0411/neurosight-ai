@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+
+# Tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Environments & secrets
+.env
+.env.*
+
+# Experiment tracking / logs
+logs/
+mlruns/
+runs/
+
+# ML artifacts — active 5-seed E5 ensemble weights and manifest are included under attested permission
+# Intermediate, legacy, and search checkpoints remain excluded
+models/**
+!models/.gitkeep
+!models/manifest.json
+!models/best_7_dual_attn_final_7_dual_attn_mri_only*.pth
+*.pt
+*.ckpt
+*.npz
+*.npy
+dataset_cache*
+
+# Data — large; raw data stays outside the repo behind the data/raw junction
+data/raw*
+data/processed/**
+!data/processed/.gitkeep
+data/uploads/**
+!data/uploads/.gitkeep
+data/metadata/*.csv
+data/metadata/*.xlsx
+data/neurosight.db
+
+# Frontend
+node_modules/
+frontend/dist/
+
+# OS
+Thumbs.db
+.DS_Store

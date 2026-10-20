@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-canvas text-ink font-sans;
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+*:focus-visible {
+  outline: 2px solid #1e40af;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.pill {
+  @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-medium;
+}
+.pill-success {
+  @apply bg-green-100 text-success;
+}
+.pill-warning {
+  @apply bg-amber-100 text-warning;
+}
+.pill-danger {
+  @apply bg-red-100 text-danger;
+}
+.pill-neutral {
+  @apply bg-slate-100 text-ink2;
+}
+.chip {
+  @apply pill bg-slate-100 border border-hairline text-ink2;
+}

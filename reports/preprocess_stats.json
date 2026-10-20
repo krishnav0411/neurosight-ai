@@ -1,0 +1,14 @@
+{
+  "processed": 373,
+  "skipped_cached": 0,
+  "2d": {
+    "mode": "2d",
+    "sessions": 373,
+    "by_subject": 150
+  },
+  "3d": {
+    "mode": "3d",
+    "sessions": 373,
+    "by_subject": 150
+  }
+}

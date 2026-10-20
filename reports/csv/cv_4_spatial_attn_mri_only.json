@@ -1,0 +1,44 @@
+{
+  "model_key": "4_spatial_attn",
+  "input_mode": "mri_only",
+  "n_folds": 5,
+  "fold_results": [
+    {
+      "best_val_auc": 0.7901785714285715,
+      "best_epoch": 13,
+      "best_val_acc": 0.7666666666666667,
+      "fold": 1,
+      "minutes": 4.9
+    },
+    {
+      "best_val_auc": 0.6615384615384615,
+      "best_epoch": 3,
+      "best_val_acc": 0.6428571428571429,
+      "fold": 2,
+      "minutes": 3.2
+    },
+    {
+      "best_val_auc": 0.8296703296703296,
+      "best_epoch": 8,
+      "best_val_acc": 0.8148148148148148,
+      "fold": 3,
+      "minutes": 4.4
+    },
+    {
+      "best_val_auc": 0.7098214285714286,
+      "best_epoch": 2,
+      "best_val_acc": 0.6,
+      "fold": 4,
+      "minutes": 3.0
+    },
+    {
+      "best_val_auc": 0.44761904761904764,
+      "best_epoch": 1,
+      "best_val_acc": 0.5172413793103449,
+      "fold": 5,
+      "minutes": 2.5
+    }
+  ],
+  "mean_auc": 0.6877655677655679,
+  "std_auc": 0.13376850003341145
+}

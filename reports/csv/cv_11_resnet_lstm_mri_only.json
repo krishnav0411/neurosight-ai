@@ -1,0 +1,44 @@
+{
+  "model_key": "11_resnet_lstm",
+  "input_mode": "mri_only",
+  "n_folds": 5,
+  "fold_results": [
+    {
+      "best_val_auc": 0.6339285714285714,
+      "best_epoch": 4,
+      "best_val_acc": 0.6666666666666666,
+      "fold": 1,
+      "minutes": 15.3
+    },
+    {
+      "best_val_auc": 0.8205128205128206,
+      "best_epoch": 5,
+      "best_val_acc": 0.6785714285714286,
+      "fold": 2,
+      "minutes": 18.0
+    },
+    {
+      "best_val_auc": 0.8901098901098902,
+      "best_epoch": 2,
+      "best_val_acc": 0.7037037037037037,
+      "fold": 3,
+      "minutes": 13.1
+    },
+    {
+      "best_val_auc": 0.7946428571428572,
+      "best_epoch": 2,
+      "best_val_acc": 0.6333333333333333,
+      "fold": 4,
+      "minutes": 13.4
+    },
+    {
+      "best_val_auc": 0.4095238095238095,
+      "best_epoch": 1,
+      "best_val_acc": 0.5517241379310345,
+      "fold": 5,
+      "minutes": 11.5
+    }
+  ],
+  "mean_auc": 0.7097435897435898,
+  "std_auc": 0.17198229201594312
+}

@@ -1,0 +1,13 @@
+======================================================================================
+  NeuroSight-E5 — same-fold CV system comparison (S0 = single champion baseline)
+======================================================================================
+  System    MeanAUC     Std  Folds   ECEraw  ECEscaled  dAUCvsS0
+  ------------------------------------------------------------------------
+  S0         0.7444  0.0965      -        -          -    0.0000
+  S1a        0.7444  0.0965      5   0.1998     0.2512   -0.0000
+  S1b        0.7270  0.0750      5   0.3209     0.1784   -0.0174
+  S2         0.7381  0.0819      5   0.2445     0.3069   -0.0063
+  S3         0.7311  0.0873      5   0.2486     0.2797   -0.0133
+
+  Selection: max mean CV AUC, tie -> ECE (plan guardrail 2).
+  Held-out test set untouched — one bake-off remains (plan guardrail 1).

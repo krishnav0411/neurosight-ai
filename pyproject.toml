@@ -1,0 +1,87 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "neurosight-ai"
+version = "0.1.0"
+description = "NeuroSight AI — longitudinal MRI dementia analysis on OASIS-2 (research use only, not a medical device)"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "NeuroSight AI Team" }]
+dependencies = [
+    "torch>=2.0",
+    "torchvision>=0.15",
+    "numpy>=1.26",
+    "pandas>=2.0",
+    "scikit-learn>=1.2",
+    "scipy>=1.10",
+    "nibabel>=5.0",
+    "opencv-python-headless>=4.8",
+    "matplotlib>=3.7",
+    "seaborn>=0.12",
+    "pillow>=9.0",
+    "pyyaml>=6.0",
+    "pydantic>=2.5",
+    "tqdm>=4.66",
+    "click>=8.1",
+    "fastapi>=0.110",
+    "uvicorn>=0.29",
+    "sqlmodel>=0.0.16",
+    "python-multipart>=0.0.9",
+    "mlflow>=2.12",
+    "tensorboard>=2.16",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.4",
+    "black>=24.4",
+    "mypy>=1.10",
+    "pre-commit>=3.7",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests", "scripts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "C4", "RUF", "T201"]
+
+[tool.ruff.lint.per-file-ignores]
+# print() is a CLI/pytest concern, never allowed inside the neurosight package
+"tests/*" = ["T201"]
+"scripts/*" = ["T201"]
+# ML conventions: dimension letters (B, T, S, H, W) and CNN_Avg-style variant
+# names match the literature and the predecessor codebase — keep them.
+"src/neurosight/models/*" = ["N801", "N806", "N812"]
+"src/neurosight/evaluation/gradcam.py" = ["N806"]
+"src/neurosight/api/main.py" = ["B008"]
+"scripts/build_reports.py" = ["E501", "B008"]
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.mypy]
+# 3.12 semantics required to parse numpy 2.x stubs; package code stays 3.11-compatible
+python_version = "3.12"
+files = ["src/neurosight"]
+ignore_missing_imports = true
+check_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# resolve neurosight from THIS checkout's src/ (worktrees must never import
+# another worktree's package through the editable install's .pth path)
+pythonpath = ["src"]
+addopts = "-q"
+markers = [
+    "local: tests that require the real OASIS-2 data on disk (skipped in CI)",
+]

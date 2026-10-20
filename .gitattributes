@@ -1,0 +1,13 @@
+* text=auto eol=lf
+
+# Explicit binary files
+*.pdf binary
+*.pptx binary
+*.pth binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.nii binary
+*.img binary
+*.hdr binary

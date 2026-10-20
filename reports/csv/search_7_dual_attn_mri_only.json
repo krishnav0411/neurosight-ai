@@ -1,0 +1,109 @@
+{
+  "grid_note": "slices fixed at 32 (cache coherence)",
+  "results": [
+    {
+      "learning_rate": 0.0003,
+      "dropout": 0.5,
+      "lstm_hidden": 32,
+      "mean_auc": 0.7140207631874298,
+      "std_auc": 0.1240976428261212,
+      "fold_aucs": [
+        0.665,
+        0.8845,
+        0.5926
+      ],
+      "minutes": 3.3
+    },
+    {
+      "learning_rate": 0.0001,
+      "dropout": 0.3,
+      "lstm_hidden": 64,
+      "mean_auc": 0.7035213243546576,
+      "std_auc": 0.12798394730447224,
+      "fold_aucs": [
+        0.6167,
+        0.8845,
+        0.6094
+      ],
+      "minutes": 5.0
+    },
+    {
+      "learning_rate": 0.0001,
+      "dropout": 0.5,
+      "lstm_hidden": 64,
+      "mean_auc": 0.7010662177328845,
+      "std_auc": 0.13673560091315273,
+      "fold_aucs": [
+        0.6167,
+        0.8939,
+        0.5926
+      ],
+      "minutes": 4.4
+    },
+    {
+      "learning_rate": 0.0001,
+      "dropout": 0.5,
+      "lstm_hidden": 32,
+      "mean_auc": 0.693195847362514,
+      "std_auc": 0.11332026917358336,
+      "fold_aucs": [
+        0.6417,
+        0.8504,
+        0.5875
+      ],
+      "minutes": 3.9
+    },
+    {
+      "learning_rate": 0.0003,
+      "dropout": 0.5,
+      "lstm_hidden": 64,
+      "mean_auc": 0.6799971941638608,
+      "std_auc": 0.12344998584708072,
+      "fold_aucs": [
+        0.6033,
+        0.8542,
+        0.5825
+      ],
+      "minutes": 3.3
+    },
+    {
+      "learning_rate": 0.0003,
+      "dropout": 0.3,
+      "lstm_hidden": 64,
+      "mean_auc": 0.6798063973063972,
+      "std_auc": 0.09943722866650723,
+      "fold_aucs": [
+        0.6183,
+        0.8201,
+        0.601
+      ],
+      "minutes": 4.0
+    },
+    {
+      "learning_rate": 0.0001,
+      "dropout": 0.3,
+      "lstm_hidden": 32,
+      "mean_auc": 0.6778815937149271,
+      "std_auc": 0.11697799794678405,
+      "fold_aucs": [
+        0.6067,
+        0.8428,
+        0.5842
+      ],
+      "minutes": 4.2
+    },
+    {
+      "learning_rate": 0.0003,
+      "dropout": 0.3,
+      "lstm_hidden": 32,
+      "mean_auc": 0.6594107744107744,
+      "std_auc": 0.10737022408210972,
+      "fold_aucs": [
+        0.5717,
+        0.8106,
+        0.596
+      ],
+      "minutes": 4.0
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "model_key": "5_temporal_attn",
+  "input_mode": "mri_only",
+  "n_folds": 5,
+  "fold_results": [
+    {
+      "best_val_auc": 0.6651785714285714,
+      "best_epoch": 1,
+      "best_val_acc": 0.6333333333333333,
+      "fold": 1,
+      "minutes": 2.1
+    },
+    {
+      "best_val_auc": 0.8461538461538461,
+      "best_epoch": 4,
+      "best_val_acc": 0.6785714285714286,
+      "fold": 2,
+      "minutes": 3.8
+    },
+    {
+      "best_val_auc": 0.8626373626373627,
+      "best_epoch": 10,
+      "best_val_acc": 0.8148148148148148,
+      "fold": 3,
+      "minutes": 5.0
+    },
+    {
+      "best_val_auc": 0.7723214285714286,
+      "best_epoch": 1,
+      "best_val_acc": 0.6666666666666666,
+      "fold": 4,
+      "minutes": 2.6
+    },
+    {
+      "best_val_auc": 0.48095238095238096,
+      "best_epoch": 1,
+      "best_val_acc": 0.5517241379310345,
+      "fold": 5,
+      "minutes": 2.6
+    }
+  ],
+  "mean_auc": 0.725448717948718,
+  "std_auc": 0.14071137308251264
+}

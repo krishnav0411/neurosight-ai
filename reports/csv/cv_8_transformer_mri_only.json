@@ -1,0 +1,44 @@
+{
+  "model_key": "8_transformer",
+  "input_mode": "mri_only",
+  "n_folds": 5,
+  "fold_results": [
+    {
+      "best_val_auc": 0.7678571428571428,
+      "best_epoch": 4,
+      "best_val_acc": 0.7333333333333333,
+      "fold": 1,
+      "minutes": 1.1
+    },
+    {
+      "best_val_auc": 0.7076923076923077,
+      "best_epoch": 2,
+      "best_val_acc": 0.6428571428571429,
+      "fold": 2,
+      "minutes": 1.2
+    },
+    {
+      "best_val_auc": 0.8186813186813187,
+      "best_epoch": 3,
+      "best_val_acc": 0.7777777777777778,
+      "fold": 3,
+      "minutes": 1.1
+    },
+    {
+      "best_val_auc": 0.7455357142857144,
+      "best_epoch": 2,
+      "best_val_acc": 0.7,
+      "fold": 4,
+      "minutes": 1.1
+    },
+    {
+      "best_val_auc": 0.5952380952380952,
+      "best_epoch": 12,
+      "best_val_acc": 0.5517241379310345,
+      "fold": 5,
+      "minutes": 2.4
+    }
+  ],
+  "mean_auc": 0.7270009157509159,
+  "std_auc": 0.07503643054705748
+}

@@ -1,0 +1,44 @@
+{
+  "model_key": "10_3d_lstm",
+  "input_mode": "mri_only",
+  "n_folds": 5,
+  "fold_results": [
+    {
+      "best_val_auc": 0.7633928571428572,
+      "best_epoch": 10,
+      "best_val_acc": 0.7,
+      "fold": 1,
+      "minutes": 39.2
+    },
+    {
+      "best_val_auc": 0.7846153846153847,
+      "best_epoch": 6,
+      "best_val_acc": 0.6071428571428571,
+      "fold": 2,
+      "minutes": 53.6
+    },
+    {
+      "best_val_auc": 0.8241758241758241,
+      "best_epoch": 10,
+      "best_val_acc": 0.7777777777777778,
+      "fold": 3,
+      "minutes": 65.9
+    },
+    {
+      "best_val_auc": 0.7455357142857142,
+      "best_epoch": 1,
+      "best_val_acc": 0.6,
+      "fold": 4,
+      "minutes": 27.6
+    },
+    {
+      "best_val_auc": 0.5428571428571429,
+      "best_epoch": 5,
+      "best_val_acc": 0.5517241379310345,
+      "fold": 5,
+      "minutes": 42.4
+    }
+  ],
+  "mean_auc": 0.7321153846153846,
+  "std_auc": 0.09819209962277978
+}
