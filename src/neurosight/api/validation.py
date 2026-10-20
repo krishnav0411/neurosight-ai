@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import re
 import uuid
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -56,7 +57,7 @@ def _group_key(filename: str, explicit_label: str | None) -> str:
 
 
 def validate_and_persist(
-    files: list[tuple[str, bytes | Path]],
+    files: Sequence[tuple[str, bytes | Path]],
     cfg: ServingConfig,
     job_id: str,
     visit_labels: list[str] | None = None,

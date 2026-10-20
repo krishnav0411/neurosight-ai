@@ -145,7 +145,7 @@ def create_app(
     ):
         job_id = uuid.uuid4().hex
         staging_dir = cfg.uploads_dir / f".tmp_staging_{job_id}"
-        staged_files: list[tuple[str, Path]] = []
+        staged_files: list[tuple[str, bytes | Path]] = []
         max_bytes = cfg.max_upload_mb * 1024 * 1024
         total_read = 0
         chunk_size = 64 * 1024
