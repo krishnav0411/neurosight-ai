@@ -231,44 +231,51 @@ def test_resolve_final_checkpoint_never_falls_back_to_other_checkpoints(tmp_path
         mod.resolve_final_checkpoint(tmp_path, "3_cnn_lstm", "mri_only")
 
 
-def test_evaluate_preserves_active_e5_serving_manifest(tmp_path: Path, monkeypatch) -> None:
-    """scripts/evaluate.py must never overwrite an active neurosight-e5 serving manifest."""
+def test_resolve_target_manifest_default_and_e5_safeguard(tmp_path: Path, monkeypatch) -> None:
+    """Exercise production resolve_target_manifest from scripts/evaluate.py."""
     import json
 
-    monkeypatch.chdir(tmp_path)
+    mod = _load_evaluate_module()
+    resolve_target_manifest = mod.resolve_target_manifest
 
-    models_dir = tmp_path / "models"
-    models_dir.mkdir()
-    e5_manifest = models_dir / "manifest.json"
+    canonical = tmp_path / "models" / "manifest.json"
+    canonical.parent.mkdir(parents=True, exist_ok=True)
+    fallback = tmp_path / "reports" / "evaluation_manifest.json"
+
+    # 1. Default when manifest_path is None returns fallback path
+    assert (
+        resolve_target_manifest(None, canonical_serving=canonical, fallback_path=fallback)
+        == fallback
+    )
+
+    # 2. When canonical exists with active_system="neurosight-e5" and no force, diverts to fallback
     e5_data = {
         "active_system": "neurosight-e5",
         "model_key": "7_dual_attn",
         "members": {"s42": "m1.pth", "s43": "m2.pth"},
     }
-    e5_manifest.write_text(json.dumps(e5_data), encoding="utf-8")
-
-    # If evaluate target_manifest is canonical models/manifest.json without force,
-    # the safeguard must redirect write to reports/evaluation_manifest.json
-    target_manifest = Path("models/manifest.json")
-    canonical_serving = Path("models/manifest.json")
-    force_manifest = False
-
-    if target_manifest.resolve() == canonical_serving.resolve() and canonical_serving.exists():
-        existing = json.loads(canonical_serving.read_text(encoding="utf-8"))
-        if existing.get("active_system") == "neurosight-e5" and not force_manifest:
-            target_manifest = Path("reports/evaluation_manifest.json")
-
-    new_payload = {"active_model": "3_cnn_lstm", "test_acc": 0.59}
-    target_manifest.parent.mkdir(parents=True, exist_ok=True)
-    target_manifest.write_text(json.dumps(new_payload), encoding="utf-8")
-
-    # Verify original e5 manifest remains intact and undisturbed
-    after = json.loads(e5_manifest.read_text(encoding="utf-8"))
-    assert after["active_system"] == "neurosight-e5"
-    assert "members" in after
-
-    # Verify redirected file was written
-    redirected = json.loads(
-        (tmp_path / "reports" / "evaluation_manifest.json").read_text(encoding="utf-8")
+    canonical.write_text(json.dumps(e5_data), encoding="utf-8")
+    resolved = resolve_target_manifest(
+        canonical, canonical_serving=canonical, force_manifest=False, fallback_path=fallback
     )
-    assert redirected["active_model"] == "3_cnn_lstm"
+    assert resolved == fallback
+
+    # 3. When force_manifest=True, permits targeting canonical even with active E5
+    forced = resolve_target_manifest(
+        canonical, canonical_serving=canonical, force_manifest=True, fallback_path=fallback
+    )
+    assert forced == canonical
+
+    # 4. Fail-closed on malformed JSON: raises ValueError when attempting to overwrite without force
+    canonical.write_text("{corrupt: json content", encoding="utf-8")
+    with pytest.raises(ValueError, match=r"malformed or invalid JSON.*Failing closed"):
+        resolve_target_manifest(
+            canonical, canonical_serving=canonical, force_manifest=False, fallback_path=fallback
+        )
+
+    # 5. Non-E5 valid manifest is allowed without force
+    canonical.write_text(json.dumps({"active_system": "single-model"}), encoding="utf-8")
+    non_e5 = resolve_target_manifest(
+        canonical, canonical_serving=canonical, force_manifest=False, fallback_path=fallback
+    )
+    assert non_e5 == canonical

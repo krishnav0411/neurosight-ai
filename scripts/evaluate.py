@@ -4,8 +4,9 @@
     python scripts/evaluate.py --model 3_cnn_lstm --calibrate --gradcam
 
 Produces reports/final_evaluation.txt, reports/csv/final_metrics.json,
-figures (ROC/calibration/confusion), and updates models/manifest.json with the
-fitted temperature so serving matches research numbers exactly.
+figures (ROC/calibration/confusion), and saves an evaluation manifest
+to reports/evaluation_manifest.json (preserving active serving manifests
+unless explicitly targeted with --force-manifest).
 """
 
 from __future__ import annotations
@@ -50,6 +51,49 @@ def resolve_final_checkpoint(checkpoint_dir: str | Path, model_key: str, input_m
     if not ckpt.exists():
         raise FileNotFoundError(f"no final checkpoint for {model_key}/{input_mode}: {ckpt}")
     return ckpt
+
+
+def resolve_target_manifest(
+    manifest_path: str | Path | None = None,
+    canonical_serving: str | Path = Path("models/manifest.json"),
+    force_manifest: bool = False,
+    fallback_path: str | Path = Path("reports/evaluation_manifest.json"),
+) -> Path:
+    """Resolve destination path for evaluation manifest safeguarding active serving manifests.
+
+    Defaults to `fallback_path` (reports/evaluation_manifest.json) when `manifest_path` is None.
+    If explicitly targeting `canonical_serving` (models/manifest.json):
+      - If existing file is valid and belongs to 'neurosight-e5' and not `force_manifest`,
+        safely divert to `fallback_path` to avoid clobbering serving ensembles.
+      - If existing file exists and is malformed / invalid JSON and not `force_manifest`,
+        fail closed with ValueError to prevent accidental corruption or blind overwrite.
+      - If `force_manifest` is True, permits writing to `canonical_serving`.
+    """
+    target = Path(manifest_path) if manifest_path else Path(fallback_path)
+    canonical = Path(canonical_serving)
+
+    if target.resolve() == canonical.resolve() and canonical.exists():
+        if force_manifest:
+            return target
+        try:
+            content = canonical.read_text(encoding="utf-8")
+            existing = json.loads(content)
+        except Exception as exc:
+            raise ValueError(
+                f"Existing manifest at {canonical} is malformed or invalid JSON ({exc}). "
+                f"Failing closed to prevent overwriting without --force-manifest."
+            ) from exc
+
+        if existing.get("active_system") == "neurosight-e5":
+            logger.warning(
+                "Refusing to overwrite active E5 serving manifest at %s without "
+                "--force-manifest. Writing evaluation manifest to %s instead.",
+                canonical,
+                fallback_path,
+            )
+            return Path(fallback_path)
+
+    return target
 
 
 @click.command()
@@ -190,23 +234,12 @@ def main(
         },
         "git_state": "see git log",
     }
-    target_manifest = (
-        Path(manifest_path) if manifest_path else Path("reports/evaluation_manifest.json")
+    target_manifest = resolve_target_manifest(
+        manifest_path=manifest_path,
+        canonical_serving=Path("models/manifest.json"),
+        force_manifest=force_manifest,
+        fallback_path=Path("reports/evaluation_manifest.json"),
     )
-    canonical_serving = Path("models/manifest.json")
-    if target_manifest.resolve() == canonical_serving.resolve() and canonical_serving.exists():
-        try:
-            existing = json.loads(canonical_serving.read_text(encoding="utf-8"))
-            if existing.get("active_system") == "neurosight-e5" and not force_manifest:
-                logger.warning(
-                    "Refusing to overwrite active E5 serving manifest at %s without "
-                    "--force-manifest. Writing evaluation manifest to "
-                    "reports/evaluation_manifest.json instead.",
-                    canonical_serving,
-                )
-                target_manifest = Path("reports/evaluation_manifest.json")
-        except Exception:
-            pass
     target_manifest.parent.mkdir(parents=True, exist_ok=True)
     target_manifest.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
     logger.info("Evaluation manifest saved to %s", target_manifest)

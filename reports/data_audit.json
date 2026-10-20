@@ -1,6 +1,6 @@
 {
   "csv": {
-    "source": "F:\\AI Project\\neurosight-ai\\data\\metadata\\oasis_longitudinal.csv",
+    "source": "data/metadata/oasis_longitudinal.csv",
     "sha256": "d2f0a15ff35fa4a65c35c064b848fc1b396e9d2f4aec935c88d6e1588d31d40e",
     "rows": 373,
     "columns": [
@@ -51,8 +51,8 @@
       "4": 249
     },
     "raw_paths": [
-      "F:\\AI Project\\neurosight-ai\\data\\raw\\OAS2_RAW_PART1",
-      "F:\\AI Project\\neurosight-ai\\data\\raw\\OAS2_RAW_PART2"
+      "data/raw/OAS2_RAW_PART1",
+      "data/raw/OAS2_RAW_PART2"
     ]
   }
 }

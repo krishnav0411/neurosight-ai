@@ -281,6 +281,8 @@ def load_facts() -> dict:
         "cv_std_max": f"{max(v['std_auc'] for v in variants):.3f}",
         "cv_n_folds": str(champion["n_folds"]),
         # excellence systems
+        "s1a_ece_raw": f"{excellence['S1a']['mean_ece_raw']:.4f}",
+        "s1a_ece_scaled": f"{excellence['S1a']['mean_ece_scaled']:.4f}",
         "s2_mean": f"{excellence['S2']['mean_auc']:.3f}",
         "s2_delta": f"{abs(excellence['S2']['mean_auc'] - s0_mean):.3f}",
         "s3_mean": f"{excellence['S3']['mean_auc']:.3f}",
@@ -714,7 +716,7 @@ def build_pdf(facts: dict) -> tuple[int, dict[str, int]]:
     story.append(
         Paragraph(
             "S0 equals S1a by construction (same checkpoints, same scoring). * S0 ECE was not measured "
-            "in the initial 5-fold CV ablation artifact; measured as 0.1998 raw / 0.2512 scaled under S1a. "
+            f"in the initial 5-fold CV ablation artifact; measured as {facts['s1a_ece_raw']} raw / {facts['s1a_ece_scaled']} scaled under S1a. "
             "Selection rule: max mean CV AUC, tie by ECE, test set untouched (plan guardrails 1 and 2).",
             styles["caption"],
         )

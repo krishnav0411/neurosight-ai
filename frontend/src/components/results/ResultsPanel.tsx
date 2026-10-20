@@ -1,5 +1,5 @@
 /**
- * Results dashboard (matches the approved Stitch render): a subject header
+ * Results dashboard: a subject header
  * strip, a two-column top row (Primary Clinical Diagnosis + Longitudinal
  * progression, or a single-visit chip), the interpretable attention maps,
  * the action row and — always last — the research-use disclaimer.

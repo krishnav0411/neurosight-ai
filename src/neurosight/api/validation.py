@@ -56,34 +56,44 @@ def _group_key(filename: str, explicit_label: str | None) -> str:
 
 
 def validate_and_persist(
-    files: list[tuple[str, bytes]],
+    files: list[tuple[str, bytes | Path]],
     cfg: ServingConfig,
     job_id: str,
     visit_labels: list[str] | None = None,
 ) -> ValidatedUpload:
-    """Validate uploaded (filename, bytes) pairs and persist them under
+    """Validate uploaded (filename, bytes_or_path) pairs and persist them under
     ``uploads_dir/<job_id>/``.
 
-    Pairing happens on the ORIGINAL filenames in memory; each complete series
-    is then persisted under one shared random base name (so ``.img``/``.hdr``
-    twins keep matching on disk). Raises :class:`UploadValidationError` with
-    every problem found, naming the original files.
+    Accepts either in-memory bytes or staged temporary file paths for streaming
+    uploads to avoid holding entire multi-file payloads in RAM.
+
+    Pairing happens on the ORIGINAL filenames; each complete series is then
+    persisted under one shared random base name (so ``.img``/``.hdr`` twins keep
+    matching on disk). Raises :class:`UploadValidationError` with every problem
+    found, naming the original files.
     """
+    import shutil
+
     explicit: list[str] = list(visit_labels or [])
     if explicit and len(explicit) != len(files):
         raise UploadValidationError(
             [f"visit_labels has {len(explicit)} entries for {len(files)} files"]
         )
     problems: list[str] = []
-    total_bytes = sum(len(b) for _, b in files)
+    total_bytes = 0
+    for _, item in files:
+        if isinstance(item, Path):
+            total_bytes += item.stat().st_size
+        else:
+            total_bytes += len(item)
     if total_bytes > cfg.max_upload_mb * 1024 * 1024:
         problems.append(f"study exceeds {cfg.max_upload_mb} MB")
     if not files:
         problems.append("no files uploaded")
 
-    # visit group -> series key -> {img|hdr|nii: (original_name, bytes)}
-    grouped: dict[str, dict[str, dict[str, tuple[str, bytes]]]] = {}
-    for i, (fname, blob) in enumerate(files):
+    # visit group -> series key -> {img|hdr|nii: (original_name, item)}
+    grouped: dict[str, dict[str, dict[str, tuple[str, bytes | Path]]]] = {}
+    for i, (fname, item) in enumerate(files):
         safe = Path(fname).name
         suffix = Path(safe).suffix.lower()
         if suffix not in ALLOWED_SUFFIXES:
@@ -99,10 +109,17 @@ def validate_and_persist(
         else:
             key = Path(safe).stem.lower()
             part = "nii"
-        grouped.setdefault(group, {}).setdefault(key, {})[part] = (safe, blob)
+        grouped.setdefault(group, {}).setdefault(key, {})[part] = (safe, item)
 
     if problems:
         raise UploadValidationError(problems)
+
+    def _save_data(item: bytes | Path, dest: Path) -> None:
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        if isinstance(item, Path):
+            shutil.move(str(item), str(dest))
+        else:
+            dest.write_bytes(item)
 
     # Pair per visit; orphan errors name the ORIGINAL files.
     upload_dir = cfg.uploads_dir / job_id
@@ -112,19 +129,17 @@ def validate_and_persist(
         complete: list[str] = []
         for _key, parts in sorted(grouped[group].items()):
             if "nii" in parts:
-                orig, blob = parts["nii"]
+                orig, item = parts["nii"]
                 dest = upload_dir / f"{uuid.uuid4().hex}.nii"
-                dest.parent.mkdir(parents=True, exist_ok=True)
-                dest.write_bytes(blob)
+                _save_data(item, dest)
                 complete.append(str(dest))
             elif "img" in parts and "hdr" in parts:
                 base = uuid.uuid4().hex
                 img_dest: Path | None = None
                 for part, suffix in (("img", ".img"), ("hdr", ".hdr")):
-                    _, blob = parts[part]
+                    _, item = parts[part]
                     dest = upload_dir / f"{base}{suffix}"
-                    dest.parent.mkdir(parents=True, exist_ok=True)
-                    dest.write_bytes(blob)
+                    _save_data(item, dest)
                     if part == "img":
                         img_dest = dest  # pipeline loads the .img; the .hdr sits beside it
                 assert img_dest is not None

@@ -143,28 +143,37 @@ def create_app(
         visit_labels_json: str | None = Form(None),
         include_gradcam: bool = Form(True),
     ):
+        job_id = uuid.uuid4().hex
+        staging_dir = cfg.uploads_dir / f".tmp_staging_{job_id}"
+        staged_files: list[tuple[str, Path]] = []
         max_bytes = cfg.max_upload_mb * 1024 * 1024
         total_read = 0
         chunk_size = 64 * 1024
-        blobs: list[tuple[str, bytes]] = []
         try:
+            staging_dir.mkdir(parents=True, exist_ok=True)
             for f in files:
-                chunks: list[bytes] = []
-                while True:
-                    chunk = await f.read(chunk_size)
-                    if not chunk:
-                        break
-                    total_read += len(chunk)
-                    if total_read > max_bytes:
-                        raise HTTPException(
-                            status_code=413,
-                            detail=(
-                                f"Upload payload exceeds maximum allowed size of "
-                                f"{cfg.max_upload_mb} MB"
-                            ),
-                        )
-                    chunks.append(chunk)
-                blobs.append((f.filename or "unnamed", b"".join(chunks)))
+                staged_path = staging_dir / f"{uuid.uuid4().hex}.tmp"
+                with open(staged_path, "wb") as out_f:
+                    while True:
+                        chunk = await f.read(chunk_size)
+                        if not chunk:
+                            break
+                        total_read += len(chunk)
+                        if total_read > max_bytes:
+                            raise HTTPException(
+                                status_code=413,
+                                detail=(
+                                    f"Upload payload exceeds maximum allowed size of "
+                                    f"{cfg.max_upload_mb} MB"
+                                ),
+                            )
+                        out_f.write(chunk)
+                staged_files.append((f.filename or "unnamed", staged_path))
+        except Exception:
+            import shutil
+
+            shutil.rmtree(staging_dir, ignore_errors=True)
+            raise
         finally:
             for f in files:
                 try:
@@ -178,19 +187,31 @@ def create_app(
             explicit = json.loads(visit_labels_json) if visit_labels_json else None
             demo = json.loads(demographics) if demographics else None
         except json.JSONDecodeError as exc:
+            import shutil
+
+            shutil.rmtree(staging_dir, ignore_errors=True)
             raise HTTPException(422, detail=f"malformed JSON form field: {exc}") from exc
         if explicit is not None and (
             not isinstance(explicit, list) or not all(isinstance(x, str) for x in explicit)
         ):
+            import shutil
+
+            shutil.rmtree(staging_dir, ignore_errors=True)
             raise HTTPException(422, detail="visit_labels_json must be a JSON list of labels")
         if demo is not None and not isinstance(demo, dict):
+            import shutil
+
+            shutil.rmtree(staging_dir, ignore_errors=True)
             raise HTTPException(422, detail="demographics must be a JSON object")
 
-        job_id = uuid.uuid4().hex
         try:
-            upload = validate_and_persist(blobs, cfg, job_id, explicit)
+            upload = validate_and_persist(staged_files, cfg, job_id, explicit)
         except UploadValidationError as exc:
             raise HTTPException(422, detail={"problems": exc.problems}) from exc
+        finally:
+            import shutil
+
+            shutil.rmtree(staging_dir, ignore_errors=True)
 
         manifest = {"visits": upload.visits, "visit_labels": upload.visit_labels}
         manifest_path = cfg.uploads_dir / job_id / "visit_manifest.json"

@@ -8,7 +8,7 @@
   (`Datasets/OAS2_RAW_PART1`: 209 sessions / 82 subjects; `OAS2_RAW_PART2`: 164 sessions / 68 subjects),
   each session `OAS2_XXXX_MRY/RAW/mpr-N.nifti.img` + `.hdr` (Analyze 7.5 pair, 1–4 series).
   Exposed to the repo via the `data/raw` junction.
-- **Raw data location:** Local dataset storage outside this repository (e.g. `F:/AI Project/datasets` or user-configured folder), mapped to the project via the `data/raw` directory junction or symlink. Raw OASIS files are gitignored by design.
+- **Raw data location:** Local dataset storage outside this repository (e.g. `data/raw` or user-configured external folder), mapped to the project via the `data/raw` directory junction or symlink. Raw OASIS files are gitignored by design.
 
 ## Demographics CSV
 

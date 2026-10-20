@@ -1,7 +1,7 @@
 # 06 — Engineering Plan
 
 **Project:** NeuroSight AI · v1.0 · 2026-09-14
-**Format:** tasks in dependency order with **tests** and **done criteria** (per the 6-Document Build System). Estimated effort assumes one engineer + AI agent on the dev box (Windows 11, RTX 4050 6 GB). Training wall-clock is called out separately from build time — the old plan's "30 min per phase" conflated them.
+**Format:** tasks in dependency order with **tests** and **done criteria** (per the 6-Document Build System). Estimated effort assumes an engineering team on the dev box (Windows 11, RTX 4050 6 GB). Training wall-clock is called out separately from build time — the old plan's "30 min per phase" conflated them.
 
 **Legend:** dep = prerequisite tasks. Every task ends with its DoD (definition of done). Where a task ports code from baseline implementations, the source file is named — port means: copy logic, fix the named defects, add types/tests, wire to config (no behavior re-invention).
 
